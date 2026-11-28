@@ -5,7 +5,7 @@ title: "WP-095: Phantom's wizard's skull, the demo and the attempt played"
 
 # WP-095: Phantom's wizard's skull: the demo and the attempt played (Gen 1)
 
-**Status:** ✅ Done (2026-11-28). Fork PR [barefootbetters/scummvm#19](https://github.com/barefootbetters/scummvm/pull/19) is open.
+**Status:** ✅ Done (2026-11-28). Fork PR [barefootbetters/scummvm#19](https://github.com/barefootbetters/scummvm/pull/19) merged on 2026-11-28 (merge commit `6b5b02c53b`).
 **Phase:** 5 (a gap found while searching packets for setup-only checks)
 **Depends on:** WP-077 ✅ (the room's class), WP-072 ✅ (the magic mirror room, the demo's way in and out), WP-081 ✅ (the bedroom a solve leads to)
 **Companion EC:** none (inline checklist under Exit criteria)
@@ -71,7 +71,7 @@ a pointer in WP-077, and the index row.
 2. [x] **Live (session).** From the mirror room, the hand demonstrates and the
    gang returns through movie 31. From the library, clicking the skulls to the
    combination opens the wizard's bedroom through movie 6.
-3. [x] **Process.** The fork PR against `scooby-engine` is open, and each claim
+3. [x] **Process.** The fork PR against `scooby-engine` is open (merged later the same day), and each claim
    carries its evidence label.
 
 ## Result
@@ -178,7 +178,9 @@ the combination 1, 0, 3, 2, the faces 2, 0, 3, 1, `IntroDone` clear, and
 ## Deliverables
 
 - Fork: `wp-095-wizards-skull`, PR [barefootbetters/scummvm#19](https://github.com/barefootbetters/scummvm/pull/19)
-  (`ab9a1d261b`). Staged by name: `wizards_rooms.{h,cpp}` and `wizards_check.cpp`.
+  (`ab9a1d261b`), merged on 2026-11-28 as `6b5b02c53b`; the fork worktree is
+  removed, and `C:\dev\scummvm` was rebuilt from it. Staged by name:
+  `wizards_rooms.{h,cpp}` and `wizards_check.cpp`.
 - Docs: this packet, its pre-flight, the WP-095 note in scooby-exe, the pointer
   in WP-077, and the index row. The WP-094 index row now also records its merge.
 - Local only: the decompile dumps, the test profile, the self-test and live
