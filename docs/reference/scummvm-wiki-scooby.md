@@ -58,7 +58,6 @@ The Gen 1 engine needs these files (all in `\scooby\`):
 |---|---|
 | `TGIFILE.ART` | Art archive — rooms, sprites, cels (all graphics) |
 | `object.ini` | Interactive-object / room-script table |
-| `Scooby.eng` | Engine error-string table |
 | `Music.dat` | Music archive (PCM) |
 | `Sfx.dat` | Sound-effects archive (PCM) |
 | `Voice.dat` | Voice archive (PCM) |
@@ -66,8 +65,11 @@ The Gen 1 engine needs these files (all in `\scooby\`):
 | `Scooby.exe` | Used for **detection only** — the engine does not execute it |
 
 `binkw32.dll` ships on the disc but is **not** used — ScummVM decodes Bink
-itself. The bundled `AOL\`, `messagemate\`, `INSTALL\`, `Play.exe`,
-`SETUP.EXE` and `showdown.cd` marker are not engine data.
+itself. `Scooby.eng`, the original executable's error-string table, isn't
+read either: the engine has its own messages. The bundled `AOL\`,
+`messagemate\`, `INSTALL\`, `Play.exe`, `SETUP.EXE` and `showdown.cd` marker
+are not engine data. A copy of just the files above, without the rest of the
+disc, plays the same as the disc itself (verified on *Showdown*, 2026-11-28).
 
 ## Save-state support
 

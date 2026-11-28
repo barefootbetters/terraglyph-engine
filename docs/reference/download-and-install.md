@@ -43,10 +43,10 @@ for how the rooms connect.
 ### Required game-data files
 
 Point ScummVM at the disc's **`\scooby\`** folder (or the disc root). The Gen 1
-engine reads `TGIFILE.ART`, `object.ini`, `Scooby.eng`, `Music.dat`, `Sfx.dat`,
-`Voice.dat`, the `BK.NNN` cutscenes, and uses `Scooby.exe` for detection only
-(it is never executed). The disc's `binkw32.dll` is **not** used — ScummVM
-decodes Bink itself. Full per-title file and MD5 details are on the
+engine reads `TGIFILE.ART`, `object.ini`, `Music.dat`, `Sfx.dat`, `Voice.dat`
+and the `BK.NNN` cutscenes, and uses `Scooby.exe` for detection only (it is
+never executed). The disc's `binkw32.dll` and `Scooby.eng` are **not** used —
+ScummVM decodes Bink itself, and the engine has its own messages. Full per-title file and MD5 details are on the
 [status page](scummvm-wiki-scooby.md#required-game-data-files).
 
 ---
