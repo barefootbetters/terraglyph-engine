@@ -50,7 +50,13 @@ listing of `files/packages/`, `files/saves/` and the library entries
       execution (Rec)"), and `Get-FileHash` matches them.
 - [ ] The TCL is reachable over Windows `adb`, and its free internal storage
       is recorded (`adb shell df /data`). **Stop if under 2 GiB free**: the
-      update test needs ~1.46 GiB. The TV refused `adb` at pre-flight.
+      update test needs ~1.46 GiB. At pre-flight it was paired and had
+      17,063,208 KiB (≈16.3 GiB) free ([pre-flight §Device](../reference/pre-flight-WP-096-2026-11-28.md#device-the-tcl-65q77k)).
+      Re-check at the run. `adb devices` may list the TV twice (two mDNS
+      names), so pin every command with `adb -t <transport>` or `-s <serial>`.
+- [ ] Snapshot S's baseline includes the existing state: WP-085's `bass-cd`
+      package and `installed.json`, and the saves `SKY-VM.*`, `showdown-win.001`
+      and `showdown-win.002`.
 
 ## Step 1: build and install (time-box 0:45)
 
