@@ -5,7 +5,7 @@ title: "WP-096: Google TV package storage and download reliability"
 
 # WP-096: Google TV package storage and download reliability
 
-**Status:** 📝 Drafted (2026-11-28) · needs pre-flight.
+**Status:** 📝 Drafted (2026-11-28) · D1–D4 answered 2026-11-28 · needs pre-flight.
 **Numbering:** WP-086 is the Hotspot Magnet research (✅), and WP-095 is held
 by the open wizard's-skull PR, so this takes WP-096 and EC-014 (EC-011 has
 never been used) ([wp-lifecycle §Supersession check](../reference/wp-lifecycle.md#supersession-check-required-before-reserving-a-number)).
@@ -129,6 +129,37 @@ free of it, as WP-085 D4 requires.
 13. Documented in the [manifest doc](../reference/tv-package-manifest.md):
     `installedSize`, the space rule, resume and Verify.
 
+**5. Interrupted installation recovery** (a power cut or a killed app during
+extraction)
+
+WP-085 already covers part of this at `bfeaa1c7ba`:
+- extraction runs inside `.staging/` and is renamed into place only when
+  complete;
+- `installed.json` is written atomically (temp file and rename), and only in
+  `applyPending()` after that rename;
+- `cleanOrphans()` deletes any version folder that `installed.json` and
+  `pending.json` don't name.
+
+So a partly extracted game is never recorded as installed today. What's
+missing is **durability across a power cut**: no file or directory is
+`fsync`ed before those renames, so file data that hasn't reached the disk may
+be lost behind a completed rename. Staging is also swept only when the next
+download starts.
+
+14. Every extracted file is `fsync`ed (`FileOutputStream.getFD().sync()`)
+    before the staging folder is renamed into place. The written
+    `installed.json`/`pending.json` temp file is synced before its rename.
+15. On every advanced-mode start, the app runs `cleanOrphans()` and a staging
+    sweep before anything else. The sweep deletes every `.d` extraction folder
+    and temp file in `.staging/`, keeping only the `.part` download and
+    sidecar that item 9 keeps. Each deletion is logged.
+16. A package is marked installed (`installed.json`) only after its folder is
+    complete, synced and renamed. An interrupted extraction leaves the
+    previous version recorded, playable and untouched, along with every save.
+17. After an interruption, installing the same package again starts cleanly:
+    the download resumes or is reused if complete and verified, and the
+    extract starts over.
+
 ### Out of scope
 
 - **The production host and access scheme for licensed packages** (Cloudflare
@@ -148,12 +179,31 @@ free of it, as WP-085 D4 requires.
 
 ## Decisions for Jeff
 
-| # | Decision | Recommendation |
-|---|---|---|
-| D1 | **What happens when a package doesn't fit.** (a) Refuse, showing needed, free and shortfall; (b) also offer to remove other installed packages to make room | **(a)** for v1. Choosing which game to delete is a product decision, and test builds don't need it yet |
-| D2 | **A large test package.** (a) A synthetic ~420 MB zip of random data, on the public `tv-test-packages` release (no rights question, and it matches *Showdown*'s real size); (b) BASS only (69 MB, too small to stress space or resume); (c) a real *Showdown* package on a private host | **(a)**. (c) waits for the host-and-access WP |
-| D3 | **Headroom** added to the required space. (a) A fixed 64 MiB; (b) 5% of the installed size; (c) none | **(a)**. It covers filesystem overhead and the sidecars, and is easy to read in a refusal message |
-| D4 | **Testing a full disk on Jeff's TCL.** (a) Fill internal storage with a temporary filler file over `adb` until the package no longer fits, then delete it; (b) test only through a debug-build override of the free-space figure | **(a)** for the real `ENOSPC` path, with (b) as well for the quick refusal checks. The filler is deleted in the same step, and the TV's free space is recorded before and after |
+All four were answered on 2026-11-28, when Jeff relayed a review that
+approved each recommendation and added safeguards to D3 and D4.
+
+| # | Decision | Recommendation | Answer (2026-11-28) |
+|---|---|---|---|
+| D1 | **What happens when a package doesn't fit.** (a) Refuse, showing needed, free and shortfall; (b) also offer to remove other installed packages to make room | **(a)** for v1. Choosing which game to delete is a product decision, and test builds don't need it yet | **(a)**, "Approve" |
+| D2 | **A large test package.** (a) A synthetic ~420 MB zip of random data, on the public `tv-test-packages` release (no rights question, and it matches *Showdown*'s real size); (b) BASS only (69 MB, too small to stress space or resume); (c) a real *Showdown* package on a private host | **(a)**. (c) waits for the host-and-access WP | **(a)**, "Approve" |
+| D3 | **Headroom** added to the required space. (a) A fixed 64 MiB; (b) 5% of the installed size; (c) none | **(a)**. It covers filesystem overhead and the sidecars, and is easy to read in a refusal message | **(a)** "for initial testing". The 64 MiB must be **checked against what the TCL actually does**, not assumed to be enough everywhere (exit criterion 11) |
+| D4 | **Testing a full disk on Jeff's TCL.** (a) Fill internal storage with a temporary filler file over `adb` until the package no longer fits, then delete it; (b) test only through a debug-build override of the free-space figure | **(a)** for the real `ENOSPC` path, with (b) as well for the quick refusal checks. The filler is deleted in the same step, and the TV's free space is recorded before and after | **(a) and (b)**, "Approve with safeguards". The safeguards are in [§Filler safeguards](#filler-safeguards-d4) |
+
+### Filler safeguards (D4)
+
+1. **One test folder only.** Filler files go in `/sdcard/wp096-filler/`.
+   Nothing is written anywhere else, and the cleanup deletes only that folder.
+2. **Never a full device.** Each filler is sized to leave a stated floor
+   free: the package's shortfall target, and never less than 256 MiB of
+   real free space, so the system and other apps keep running. The size is
+   computed from a fresh `df /data` reading just before the filler is written.
+3. **Automatic cleanup, failure included.** Fillers are created and removed
+   by one script, `tools/Invoke-TvFiller.ps1` (PowerShell). Its `try/finally`
+   deletes `/sdcard/wp096-filler/` however the step ends: a pass, a failure,
+   an `adb` error or Ctrl+C. Each filler step starts and ends with `df /data`,
+   and the end reading must be within 1 MiB of the start.
+4. **No orphans between sessions.** EC-014's pre-flight removes any
+   `/sdcard/wp096-filler/` left from a previous run before anything else.
 
 ## Engineering calls (Claude's, for pre-flight review)
 
@@ -191,8 +241,8 @@ free of it, as WP-085 D4 requires.
 1. Pre-flight: `pre-flight-WP-096-<date>.md`, with D1–D4 answered and the
    GitHub Releases `Range` behaviour recorded.
 2. Implement in the order of the scope sections: 1 (preflight), 2 (resume),
-   3 (integrity), 4 (the preservation checks are mostly tests). One commit per
-   section on the fork branch.
+   3 (integrity), 5 (interrupted install), and 4 (the preservation checks,
+   mostly tests). One commit per section on the fork branch.
 3. Exercise the pure-Java parts on a desktop JVM, as WP-085 did for
    zip-slip: the space arithmetic, the resume decision table, the
    `.files.json` comparison.
@@ -201,7 +251,7 @@ free of it, as WP-085 D4 requires.
 
 ## Exit criteria
 
-1. [ ] D1–D4 answered; pre-flight READY.
+1. [ ] D1–D4 answered (✅ 2026-11-28); pre-flight READY.
 2. [ ] With too little space (a filler file, per D4), installing the synthetic
    package is refused **before** any byte reaches `.staging/`. The refusal
    shows needed, free and shortfall, and the free-space figure before and
@@ -220,21 +270,44 @@ free of it, as WP-085 D4 requires.
    from 0 too (logged; local test or JVM harness).
 7. [ ] Verify passes on a fresh install. After one byte of an installed file
    is changed through `run-as`, Verify names that file (logged).
-8. [ ] In each of criteria 2–7, existing saves and library entries are
+8. [ ] In each of criteria 2–7 and 12, existing saves and library entries are
    byte-identical before and after (`run-as` listings, as in WP-085
    Milestone 4).
 9. [ ] The release APK still has no advanced-mode code (the WP-085 D4
    `apkanalyzer` and dex string checks, returning 0).
 10. [ ] The [manifest doc](../reference/tv-package-manifest.md) documents
-    `installedSize`, the space rule, resume and Verify. The fork PR is open
-    with the section commits, and §Result is written.
+    `installedSize`, the space rule, resume, Verify and the
+    interrupted-install recovery. The fork PR is open with the section
+    commits, and §Result is written.
+11. [ ] **The headroom is measured, not assumed** (D3). For BASS and the
+    synthetic package, the real free-space drop on the TCL is recorded at
+    three points: after the download, at the extract's peak, and after
+    install (`df /data` and `getAllocatableBytes`). §Result states each
+    package's overshoot over package size + installed size, and whether
+    64 MiB covered it. If it didn't, the headroom is raised to the measured
+    overshoot rounded up, and the change is noted.
+12. [ ] **Interrupted installation recovery.** The app is killed mid-extract
+    (`kill -9` of the app process) during an **update** of the synthetic
+    package, and separately `adb reboot` is run mid-extract. In each case,
+    after restart:
+    1. the previous version is still installed, recorded in `installed.json`,
+       launches and passes Verify;
+    2. every save and library entry is byte-identical to snapshot S;
+    3. the log shows the staging sweep removing the incomplete extraction;
+    4. `installed.json` never names the interrupted version;
+    5. retrying the update completes and passes Verify.
+
+    A physical power cut at the wall is run as well only if Jeff chooses it
+    at pre-flight (logged).
 
 ## Deliverables
 
 - Fork branch and PR (Java only, under `backends/platform/android/advanced/`,
   plus any manifest-merge or Gradle line it needs). No game data.
 - The updated manifest doc; `pre-flight-WP-096-<date>.md`; EC-014 filled in;
-  §Result.
+  §Result, with the measured headroom (criterion 11).
+- `tools/Invoke-TvFiller.ps1`, the D4 filler script with guaranteed cleanup
+  (this repo).
 - On Jeff's go: the synthetic test package and its manifests on
   `tv-test-packages`.
 - Never committed: game data, captures showing the TV's address or the app's

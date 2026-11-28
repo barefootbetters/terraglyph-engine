@@ -11,6 +11,52 @@ the ones specific to this engine.
 
 ---
 
+## 2026-11-28 — WP-096 decisions (package storage and download reliability)
+
+**Context.** The [ISO-free feasibility study](../reference/iso-free-execution-feasibility-2026-11-28.md)
+showed *Showdown* runs from extracted files. It measured a 400 MiB package
+that needs about 931 MiB free to install and 1.46 GiB to update. It also found
+that the WP-085 installer has no free-space check and no download resume.
+[WP-096](../work-packets/WP-096-tv-package-reliability.md) extends that
+installer rather than building a second one, and R2 hosting waits for its own
+WP. Jeff relayed a review that approved all four recommendations, added
+safeguards to D3 and D4, and added an acceptance criterion.
+
+**Decisions (Jeff, 2026-11-28).**
+
+- **D1, a package that doesn't fit:** refuse before writing anything,
+  showing needed, free and shortfall. "Approve". Offering to remove other
+  games stays a later option.
+- **D2, large test package:** a synthetic ~420 MB random-data zip on the
+  public `tv-test-packages` release. "Approve". No licensed data is hosted.
+- **D3, headroom:** a fixed 64 MiB, "Approve for initial testing". It is to be
+  **checked against the TCL's real behaviour, not assumed to be enough
+  everywhere**. That check is WP-096 exit criterion 11.
+- **D4, low-storage testing:** both a debug free-space override and a real
+  filler file on the TCL, "Approve with safeguards". Fillers go only in a
+  designated test folder, cleanup is automatic even after a failure, and the
+  device is never filled completely. The details are in WP-096
+  §Filler safeguards.
+- **Added criterion, interrupted installation recovery:** a power cut or a
+  killed app during extraction must keep the previously installed game and
+  every save, clean up incomplete staging files, let the install restart
+  safely, and never mark a partly extracted game as installed. That is WP-096
+  scope §5 and exit criterion 12.
+
+**Scope boundary.**
+
+- **In:** WP-096's refusal behaviour, test package, headroom, low-storage test
+  method, and its interrupted-install requirement.
+- **Out (not decided here):** the R2 host and access scheme for licensed
+  packages; freeing space for the user; package building; whether a physical
+  power cut is part of the TCL run (chosen at WP-096's pre-flight).
+
+**Tracked as:** [WP-096 §Decisions](../work-packets/WP-096-tv-package-reliability.md#decisions-for-jeff)
+and [EC-014](../execution-checklists/EC-014-tv-package-reliability.md). WP-096
+is ready for pre-flight.
+
+---
+
 ## 2026-11-26 — WP-085 decisions (input, test-package hosting, advanced mode)
 
 **Context.** [WP-085](../work-packets/WP-085-tv-app-pipeline.md), the Google

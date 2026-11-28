@@ -28,8 +28,15 @@ listing of `files/packages/`, `files/saves/` and the library entries
 
 ## Pre-flight
 
-- [ ] WP-096 D1–D4 answered; pre-flight verdict **READY**
-      (`pre-flight-WP-096-<date>.md`).
+- [ ] WP-096 D1–D4 answered (2026-11-28); pre-flight verdict **READY**
+      (`pre-flight-WP-096-<date>.md`). Jeff's choice on a physical power cut
+      (exit criterion 12) is recorded.
+- [ ] Any `/sdcard/wp096-filler/` left from an earlier run is removed, and
+      `df /data` is recorded as the baseline
+      ([filler safeguards](../work-packets/WP-096-tv-package-reliability.md#filler-safeguards-d4)).
+- [ ] `tools/Invoke-TvFiller.ps1` is dry-run once: it creates a 16 MiB
+      filler in `/sdcard/wp096-filler/`, is stopped with Ctrl+C, and leaves
+      the folder gone and `df /data` within 1 MiB of the baseline.
 - [ ] Fork branch, base commit and toolchain recorded (as in EC-008).
 - [ ] The GitHub Releases download of `bass-cd-1.2.zip` was requested with
       `Range: bytes=1000-`, and the status (`206` or `200`) is recorded.
@@ -51,13 +58,25 @@ listing of `files/packages/`, `files/saves/` and the library entries
 - [ ] Override (D4 b): with the debug free-space override set below the
       requirement, installing the synthetic package is refused at once. The
       message shows needed, free and shortfall, and `.staging/` stays empty.
-- [ ] Filler (D4 a): a filler file is created under `/sdcard/` leaving less
-      than the requirement, and `df` is recorded. The install is refused
-      before any download. `df` is unchanged after the attempt.
-- [ ] Without `installedSize`, with room for the zip only: the download
-      completes and verifies, the post-download check refuses, and `.staging/`
-      is emptied.
-- [ ] The filler is deleted and `df` is back to the recorded value.
+- [ ] Filler (D4 a), through `Invoke-TvFiller.ps1` only: free space is left
+      below the requirement but at or above the 256 MiB floor, with `df`
+      recorded. The install is refused before any download, and `df` is
+      unchanged after the attempt.
+- [ ] Without `installedSize`, with room for the zip only (filler again): the
+      download completes and verifies, the post-download check refuses, and
+      `.staging/` is emptied.
+- [ ] The script's cleanup has run: `/sdcard/wp096-filler/` is gone and `df`
+      is within 1 MiB of the baseline.
+
+**Outcome:**
+
+## Step 2b: measure the headroom (time-box 0:45)
+
+- [ ] With no filler, BASS and then the synthetic package are installed while
+      `df /data` and `getAllocatableBytes` are logged after the download, at
+      the extract's peak (polled once a second) and after install.
+- [ ] Each package's overshoot over package size + installed size is
+      recorded, with whether 64 MiB covered it (WP-096 exit criterion 11).
 
 **Outcome:**
 
@@ -89,10 +108,26 @@ listing of `files/packages/`, `files/saves/` and the library entries
 
 **Outcome:**
 
+## Step 5b: interrupted installation (time-box 1:00)
+
+- [ ] With an older synthetic version installed, start the update and
+      `kill -9` the app process once the log shows extraction under way. After
+      restarting: the log shows the staging sweep; `installed.json` names the
+      old version; the old version launches and passes Verify; snapshot S
+      matches.
+- [ ] Repeat with `adb reboot` mid-extract, with the same checks after boot.
+- [ ] After each interruption, retrying the update completes and passes Verify.
+- [ ] Physical power cut at the wall: only if Jeff chose it at pre-flight,
+      with the same checks. Otherwise "not run (Jeff's choice)".
+
+**Outcome:**
+
 ## Step 6: preservation and close (time-box 0:30)
 
-- [ ] For steps 2–5, snapshot S before vs. after matches for saves and
+- [ ] For steps 2–5b, snapshot S before vs. after matches for saves and
       library entries.
+- [ ] `/sdcard/wp096-filler/` does not exist and `df /data` is within 1 MiB
+      of the pre-flight baseline.
 - [ ] The manifest doc is updated, the fork PR is open, and WP-096 §Result
       is written.
 
