@@ -3232,6 +3232,38 @@ per-game combination, the way to the wizard's bedroom opens.
   are the per-game targets, randomised at new game (`0x42E880`) and read from the
   profile.
 
+> **Detail added by [WP-095](../work-packets/WP-095-wizards-skull.md)
+> (2026-11-28),** from a second decompile of the class. The account above holds;
+> these are the parts the fork had different.
+>
+> - **The faces are the room's keys.** The claim builds each skull (`0x408DC0`)
+>   and then sets its state to `ANIM_SKULL{n}` + `'A'` + `Skull{n}` (`0x401780`).
+>   That state wins over the one the profile's `Clickables` section holds, which
+>   the demo's clicks move on.
+> - **The re-read flag is the room's `+0xF4`, not the game's.** Entry sets it,
+>   and the event sets it for any object; only a skull also plays `Skull_Slide`
+>   (stopped, then played).
+> - **The hand and the exit are claimed, not built.** The claim keeps the hand's
+>   position (`+0xDC`/`+0xE0`, less skull 1's at entry) and the exit's names
+>   (`+0xF8`/`+0x100`).
+>   - On an attempt, entry builds the exit (`0x401850`, depth 0).
+>   - On the demo, entry builds the hand (`0x4314C0`: `ANIM_SKULL_HANDLIFT`,
+>     depth 1, mode 5 — stopped on its last step) **480 px below its rest**
+>     (`0x45F504`). It also puts the four skulls back on face A, stopped and as
+>     clickables.
+> - **The demo** (`0x42E3F0`, the `+0xE8` mode). Every tick while it runs, input
+>   is held (`game+0x24`) and the cursor hidden.
+>   1. The hand moves at most 5 px a tick (`0x45EDA0`) to the next skull whose
+>      `SkullCombo{n}` isn't 0. There it lowers: `HANDLIFT` backwards (mode 4).
+>   2. It turns: `HANDTURN` (mode 3), with a click queued on the skull (`0x401840`).
+>      Short of the count it plays `HANDRETURN` and turns again; at the count,
+>      `HANDLIFT` forward.
+>   3. After the last skull it goes 480 px below skull 4's spot, lowers, and the
+>      mode is 6. The room then asks for the mirror room (movie 31) every tick.
+>
+>   The faces aren't read while the hand works, so `Skull1..4` keep their
+>   values from before the demo.
+
 **The library** (`ROOM_P25_Wizards_Library`, `0x42D1F0`, vtable `0x45F484`,
 music `1`, opening `Wizards_Library.300_`) overrides reset, enter, event and
 claim; it keeps no save state of its own.
