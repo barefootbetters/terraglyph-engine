@@ -148,6 +148,10 @@ See [scooby-exe → the wizard's skull and library](../formats/scooby-exe.md#pha
 
 ## Notes
 
+- **Played by [WP-095](WP-095-wizards-skull.md) (2026-11-28).** The demo and
+  an attempt now run through the tick and live. That found the skulls' faces
+  taken from the profile's `Clickables` section instead of `Skull1..4`, and a
+  demo that didn't reset the faces to A; WP-095 fixes both.
 - First packet of the audit's group 8 (Upstairs). The dependency — the magic
   mirror room / royal gallery (WP-072) — is done.
 - **`SkullCombo0-3`** (the per-skull target rotations) are randomised at new game
