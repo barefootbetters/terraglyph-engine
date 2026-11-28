@@ -5,7 +5,7 @@ title: "WP-098: The arena pile check's flake"
 
 # WP-098: The arena pile check's flake (Gen 1)
 
-**Status:** ✅ Done (2026-11-28). Fork PR [barefootbetters/scummvm#21](https://github.com/barefootbetters/scummvm/pull/21) is open.
+**Status:** ✅ Done (2026-11-28). Fork PR [barefootbetters/scummvm#21](https://github.com/barefootbetters/scummvm/pull/21) merged on 2026-11-28 (merge commit `b24b8b25b3`).
 **Phase:** 5 (self-test hygiene)
 **Depends on:** WP-069 ✅ (the second arena and its pile check)
 **Companion EC:** none (inline checklist under Exit criteria)
@@ -64,7 +64,7 @@ pre-flight, a pointer in WP-094 and the index row.
 2. [x] **Self-test.** The pile line reads `ROOM_Brad_SPOOKY` at level 0, and
    the rest matches the WP-097 run except for the per-run random keys. No new
    warnings.
-3. [x] **Process.** The fork PR against `scooby-engine` is open.
+3. [x] **Process.** The fork PR against `scooby-engine` is open (merged later the same day).
 
 ## Result
 
@@ -91,6 +91,8 @@ temporary check this session ran and didn't commit).
 ## Deliverables
 
 - Fork: `wp-098-arena-pile-check`, PR [barefootbetters/scummvm#21](https://github.com/barefootbetters/scummvm/pull/21)
-  (`0a9c5c19a3`). Staged by name: `arena_check.cpp`.
+  (`0a9c5c19a3`), merged on 2026-11-28 as `b24b8b25b3`; the fork worktree is
+  removed, and `C:\dev\scummvm` was rebuilt from it. Staged by name:
+  `arena_check.cpp`.
 - Docs: this packet, its pre-flight, the pointer in WP-094, and the index row.
 - Local only: the self-test logs.
