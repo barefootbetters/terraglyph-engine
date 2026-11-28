@@ -209,3 +209,6 @@ and level 0.
   modelled.
 - **The arena pile check's level-0 line is flaky.** Making it independent of
   playback timing would be a small check fix of its own.
+  - **Fixed by [WP-098](WP-098-arena-pile-check.md) (2026-11-28).** The cause
+    wasn't playback timing. An unseeded rattle during the room's entry click
+    queued a click of the room's own, which took the check's click with it.
