@@ -5,7 +5,10 @@ title: "WP-096: Google TV package storage and download reliability"
 
 # WP-096: Google TV package storage and download reliability
 
-**Status:** 📝 Drafted (2026-11-28) · D1–D4 answered 2026-11-28 · needs pre-flight.
+**Status:** 📝 Drafted (2026-11-28) · D1–D4 answered 2026-11-28 · pre-flight
+**READY** 2026-11-28 ([pre-flight-WP-096-2026-11-28](../reference/pre-flight-WP-096-2026-11-28.md));
+claimed by fork worktree `wp-096-tv-package-reliability`. Execution prompt
+[session-WP-096-2026-11-28](../sessions/session-WP-096-2026-11-28.md).
 **Numbering:** WP-086 is the Hotspot Magnet research (✅), and WP-095 is held
 by the open wizard's-skull PR, so this takes WP-096 and EC-014 (EC-011 has
 never been used) ([wp-lifecycle §Supersession check](../reference/wp-lifecycle.md#supersession-check-required-before-reserving-a-number)).
@@ -143,16 +146,20 @@ WP-085 already covers part of this at `bfeaa1c7ba`:
 So a partly extracted game is never recorded as installed today. What's
 missing is **durability across a power cut**: no file or directory is
 `fsync`ed before those renames, so file data that hasn't reached the disk may
-be lost behind a completed rename. Staging is also swept only when the next
-download starts.
+be lost behind a completed rename. (The staging sweep already runs on every
+advanced-mode start: `PackagesActivity.onCreate` calls `cleanStaging()` and
+`cleanOrphans()` (`:59-60`). The draft said otherwise; the pre-flight corrected
+it. That sweep deletes everything in `.staging/`, so as it stands it would also
+delete a resumable `.part`.)
 
 14. Every extracted file is `fsync`ed (`FileOutputStream.getFD().sync()`)
     before the staging folder is renamed into place. The written
     `installed.json`/`pending.json` temp file is synced before its rename.
-15. On every advanced-mode start, the app runs `cleanOrphans()` and a staging
-    sweep before anything else. The sweep deletes every `.d` extraction folder
-    and temp file in `.staging/`, keeping only the `.part` download and
-    sidecar that item 9 keeps. Each deletion is logged.
+15. The existing start-up sweep (`PackagesActivity.onCreate` → `cleanStaging()`,
+    `cleanOrphans()`) still runs first on every advanced-mode start. It now
+    deletes every `.d` extraction folder and temp file in `.staging/` but
+    keeps the `.part` downloads and sidecars that item 9 keeps. Each deletion
+    is logged.
 16. A package is marked installed (`installed.json`) only after its folder is
     complete, synced and renamed. An interrupted extraction leaves the
     previous version recorded, playable and untouched, along with every save.
@@ -217,9 +224,17 @@ approved each recommendation and added safeguards to D3 and D4.
    `If-Range` with the stored `ETag` or `Last-Modified` stops a changed object
    from being appended to an old partial file. The final SHA-256 check is the
    backstop either way.
-4. **Hosts that ignore `Range`** (they answer `200`) just restart. Before
-   relying on resume against GitHub Releases, the pre-flight records whether
-   its download redirect honours `Range`.
+4. **Hosts that ignore `Range`** (they answer `200`) just restart. The
+   pre-flight found GitHub Releases honours it: a `302` to a signed
+   `release-assets.githubusercontent.com` URL answers `206` with
+   `Content-Range` and a stable `ETag`.
+5. **Two code facts the pre-flight found** (fork `6b5b02c53b`):
+   - `open()` refuses every status but `200` (`PackageStore.java:155`), so it
+     must accept `206` for a range request.
+   - The redirect target is signed and short-lived, so a resume always
+     re-requests the **manifest URL** and follows the redirect afresh. It never
+     stores the redirected URL. The JVM harness checks that
+     `HttpURLConnection` keeps the `Range` header across the redirect.
 
 ## Dependencies
 
@@ -251,7 +266,8 @@ approved each recommendation and added safeguards to D3 and D4.
 
 ## Exit criteria
 
-1. [ ] D1–D4 answered (✅ 2026-11-28); pre-flight READY.
+1. [x] D1–D4 answered (2026-11-28); pre-flight READY
+   ([2026-11-28](../reference/pre-flight-WP-096-2026-11-28.md)).
 2. [ ] With too little space (a filler file, per D4), installing the synthetic
    package is refused **before** any byte reaches `.staging/`. The refusal
    shows needed, free and shortfall, and the free-space figure before and
@@ -297,8 +313,11 @@ approved each recommendation and added safeguards to D3 and D4.
     4. `installed.json` never names the interrupted version;
     5. retrying the update completes and passes Verify.
 
-    A physical power cut at the wall is run as well only if Jeff chooses it
-    at pre-flight (logged).
+    One physical power cut at the wall mid-extract is run as well, with
+    Jeff pulling the plug when the run sheet says to. Jeff chose it at
+    pre-flight, 2026-11-28: it's the only test of the `fsync` step, because
+    `kill -9` and `adb reboot` both leave the kernel to flush the page cache
+    (logged).
 
 ## Deliverables
 

@@ -107,8 +107,8 @@
       "workstream": "tv",
       "title": "Package storage and download reliability (WP-096)",
       "status": "next",
-      "doneWhen": "On the TV, a package that won't fit is refused before anything is written, an interrupted download resumes, and Verify catches a changed file, with installed games and saves untouched throughout.",
-      "note": "Drafted 2026-11-28 from the ISO-free feasibility study: Showdown needs ~931 MiB free to install a 531 MiB game."
+      "doneWhen": "On the TV, a package that won't fit is refused before anything is written, an interrupted download resumes, Verify catches a changed file, and a power cut mid-extract leaves the old version and saves intact.",
+      "note": "Pre-flight ready and claimed 2026-11-28. From the ISO-free feasibility study: Showdown needs ~931 MiB free to install a 531 MiB game."
     },
     {
       "id": "tv-dpad",

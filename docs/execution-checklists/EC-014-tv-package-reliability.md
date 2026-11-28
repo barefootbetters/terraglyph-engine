@@ -28,21 +28,29 @@ listing of `files/packages/`, `files/saves/` and the library entries
 
 ## Pre-flight
 
-- [ ] WP-096 D1–D4 answered (2026-11-28); pre-flight verdict **READY**
-      (`pre-flight-WP-096-<date>.md`). Jeff's choice on a physical power cut
-      (exit criterion 12) is recorded.
+- [x] WP-096 D1–D4 answered (2026-11-28); pre-flight verdict **READY**
+      ([pre-flight-WP-096-2026-11-28](../reference/pre-flight-WP-096-2026-11-28.md)).
+      Jeff chose one physical power cut (exit criterion 12): "Yes, once (Rec)".
 - [ ] Any `/sdcard/wp096-filler/` left from an earlier run is removed, and
       `df /data` is recorded as the baseline
       ([filler safeguards](../work-packets/WP-096-tv-package-reliability.md#filler-safeguards-d4)).
 - [ ] `tools/Invoke-TvFiller.ps1` is dry-run once: it creates a 16 MiB
       filler in `/sdcard/wp096-filler/`, is stopped with Ctrl+C, and leaves
       the folder gone and `df /data` within 1 MiB of the baseline.
-- [ ] Fork branch, base commit and toolchain recorded (as in EC-008).
-- [ ] The GitHub Releases download of `bass-cd-1.2.zip` was requested with
-      `Range: bytes=1000-`, and the status (`206` or `200`) is recorded.
-- [ ] The synthetic package (D2) and its manifests exist on Jeff's go, and
-      `Get-FileHash` matches them.
-- [ ] The TCL's free internal storage is recorded (`adb shell df /data`).
+- [x] Fork branch, base commit and toolchain recorded: `wp-096-tv-package-reliability`
+      off `origin/scooby-engine` `6b5b02c53b`; platform `android-37.0`, NDK
+      `23.2.8568313`, armeabi-v7a `liboboe.a` `399a790e…`, libpng16 v7a
+      `c1a2ca89…` (pre-flight §Repo + device state).
+- [x] The GitHub Releases download of `bass-cd-1.2.zip` was requested with
+      `Range: bytes=1000-1999`: `302`, then `206 Partial Content`,
+      `Content-Range: bytes 1000-1999/69377781`, and the 1,000 bytes match the
+      same span of a full read (pre-flight, 2026-11-28).
+- [ ] The synthetic package (D2) and its manifests are created as a new
+      `tv-test-packages` release (Jeff's go, given at pre-flight: "Yes, at
+      execution (Rec)"), and `Get-FileHash` matches them.
+- [ ] The TCL is reachable over Windows `adb`, and its free internal storage
+      is recorded (`adb shell df /data`). **Stop if under 2 GiB free**: the
+      update test needs ~1.46 GiB. The TV refused `adb` at pre-flight.
 
 ## Step 1: build and install (time-box 0:45)
 
@@ -117,8 +125,10 @@ listing of `files/packages/`, `files/saves/` and the library entries
       matches.
 - [ ] Repeat with `adb reboot` mid-extract, with the same checks after boot.
 - [ ] After each interruption, retrying the update completes and passes Verify.
-- [ ] Physical power cut at the wall: only if Jeff chose it at pre-flight,
-      with the same checks. Otherwise "not run (Jeff's choice)".
+- [ ] Physical power cut at the wall (Jeff chose it at pre-flight). Start
+      the update. When the log shows extraction under way, tell Jeff to pull
+      the TV's plug, and record his confirmation. After it boots, run the
+      same checks.
 
 **Outcome:**
 
