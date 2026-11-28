@@ -2938,6 +2938,65 @@ the game (game vtable `+0x04`) to `ROOM_P06_Garden`, `ROOM_P22_Well_In_Maze`,
 | `0x42A850` (+0x18) | Maze map placements: the four location markers |
 | `0x42A9A0` | A marker clicked: jump to its maze room |
 
+> **Corrected by [WP-097](../work-packets/WP-097-hedge-maze.md) (2026-11-28),**
+> from a second decompile of the class, the move handlers and `0x42C530`. These
+> parts of the account above were wrong:
+> - **The entry movies** are 41 (`0x29`) for the first time in the maze and 42
+>   (`0x2a`) after. Entry tests `MazeEntered` (`game+0x285`, which the in-maze
+>   branch sets), and `0x2a` is the one taken when it is set. They are movies
+>   on the maze itself (game vtable `+0x08`), not openings.
+> - **The trap cells:** level 2's middle one is `(0,4)`, cell 4, not 40.
+> - **The centre-path patch:** level 2's cell is 29 (`+0x140`), not 32.
+> - **The buttons are exits, not clickables.** `0x408D20` builds them in layer
+>   0 at depth −1000, the front one at 500, with the move handler as their
+>   callback (`0x4023F0`, `+0xA8`/`+0xAC`). The path signs are plain sprites
+>   (`0x4314C0`: layer 0, depth −1, looping), hidden. Their slots are
+>   `+0x3EC` + 4 × the path value: 1 SE, 2 NE, 3 SW, 4 NW, 5 NS, 6 EW.
+>
+> And the parts it left out:
+>
+> - **The maze map.** With the map held (`0x407060`, the history), the maze
+>   goes straight to `ROOM_Maze_Map`. If the map is in a slot, it leaves it
+>   (`0x406C80`).
+> - **The traps.** At the top of entry, a level-1 position `(4,4)`, or a
+>   level-2 `(4,1)`, `(0,4)` or `(5,8)`, sends the gang to `ROOM_P06_Garden`
+>   through movie 36 (`0x24`). The position is reset to the garden's start.
+> - **Two branches by the room come from:**
+>   - From the garden, the centre or below the balcony: only the start cell,
+>     then the maze again through movie 41 or 42. The base entry doesn't run.
+>   - From anywhere else: the base entry; `MazeEntered` set; the level's
+>     tables; the buttons, looping (mode 1); the cell's path sign shown; the
+>     unicycle's open hand cleared (`+0xB5`, `0x42B8B7`).
+>
+>   Entered from the maze itself, the unicycle also lands from the far side:
+>   - ridden up, it lands from `D` (`0x406020`, End_Down);
+>   - right, from `L` (`0x405F60`, End_Left);
+>   - down, from `U` (`0x405FE0`, End_Up);
+>   - left, from `R` (`0x405FA0`, End_Right).
+>
+>   All nine clips stop first.
+> - **A move** (the handlers) has no wall check: a wall's OVERLAY anim has no
+>   polygon to click.
+>   1. It sets the direction and steps the position.
+>   2. It picks the next room (`0x42C530`, into `+0xB8`).
+>   3. It rides the unicycle off (`0x405D90`, toward `U`/`D`/`R`/`L`), stops
+>      the nine clips and plays the start clip.
+> - **The next room** (`0x42C530`):
+>   - `(1,−1)` is below the balcony;
+>   - `(2,5)`, `(2,7)` or `(2,10)` by level is the garden;
+>   - `(1,2)`, `(1,4)` or `(3,4)` by level is the maze centre;
+>   - else the maze.
+> - **The tick:**
+>   - With `+0xB8` set, input is held and the cursor hidden. Once the
+>     unicycle's sequence has stopped, the game goes there (vtable `+0x04`, no
+>     movie).
+>   - With the unicycle idle (state 6) and `Unicycle_Idle` not playing, the
+>     nine stop and it plays.
+>   - The mutterings are scenes (`0x40B400`), and a scene's line is said only
+>     by a character in the room (`0x40C810`). `240A_`'s line ships as
+>     `…240A_1_SHAGGY`, so in the maze, where the unicycle is the only
+>     character, the scene ends at once.
+
 ##### Phantom's maze interior — the centre, the fountain and the well (WP-075)
 
 Traced 2026-11-19 for [WP-075](../work-packets/WP-075-maze-interior.md), in

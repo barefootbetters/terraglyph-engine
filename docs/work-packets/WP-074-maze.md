@@ -47,6 +47,12 @@ rooms — the two are meaningless apart. The later group-7 rooms
    - The other checks match the prior run but for the usual per-run random keys (the drawbridge's crest, Ewan's `CurrentQuestion`).
    - Fork commit [`9a0897017d`](https://github.com/barefootbetters/scummvm/commit/9a0897017d) (9 files staged by name) is pushed.
 
+> **Ported by [WP-097](WP-097-hedge-maze.md) (2026-11-28).** The modelled
+> navigation below is replaced by the original's ride. That includes the ways
+> out to the garden, below the balcony and the centre, which the model lacked.
+> WP-097 also fixes two table cells. The mutterings' silence turned out to be
+> the original's behaviour.
+
 **Deviations and gaps:**
 
 - **The cell tables are a transcription of binary code constants.** The maze
