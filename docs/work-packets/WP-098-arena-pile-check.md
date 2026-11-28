@@ -5,7 +5,7 @@ title: "WP-098: The arena pile check's flake"
 
 # WP-098: The arena pile check's flake (Gen 1)
 
-**Status:** 🟡 In progress (2026-11-28). Fork PR [barefootbetters/scummvm#21](https://github.com/barefootbetters/scummvm/pull/21) is open.
+**Status:** ✅ Done (2026-11-28). Fork PR [barefootbetters/scummvm#21](https://github.com/barefootbetters/scummvm/pull/21) is open.
 **Phase:** 5 (self-test hygiene)
 **Depends on:** WP-069 ✅ (the second arena and its pile check)
 **Companion EC:** none (inline checklist under Exit criteria)
