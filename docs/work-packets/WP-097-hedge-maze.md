@@ -5,7 +5,7 @@ title: "WP-097: Phantom's hedge maze, the original's ride"
 
 # WP-097: Phantom's hedge maze: the original's ride (Gen 1)
 
-**Status:** ✅ Done (2026-11-28). Fork PR [barefootbetters/scummvm#20](https://github.com/barefootbetters/scummvm/pull/20) is open.
+**Status:** ✅ Done (2026-11-28). Fork PR [barefootbetters/scummvm#20](https://github.com/barefootbetters/scummvm/pull/20) merged on 2026-11-28 (merge commit `8f6cd09415`).
 **Phase:** 5 (a reconstruction found while searching packets for setup-only checks)
 **Depends on:** WP-074 ✅ (the maze's class and tables), WP-075 ✅ (the centre), WP-076 ✅ (below the balcony), WP-081 ✅ (the maze map item)
 **Companion EC:** none (inline checklist under Exit criteria)
@@ -74,7 +74,7 @@ a pointer in WP-074, and the index row.
    warnings.
 2. [x] **Live (session).** Clicks through the engine's mouse ride the maze cell
    by cell and into the maze centre.
-3. [x] **Process.** The fork PR against `scooby-engine` is open, and each claim
+3. [x] **Process.** The fork PR against `scooby-engine` is open (merged later the same day), and each claim
    carries its evidence label.
 
 ## Result
@@ -172,7 +172,9 @@ starting at `(2,4)`.
 ## Deliverables
 
 - Fork: `wp-097-hedge-maze`, PR [barefootbetters/scummvm#20](https://github.com/barefootbetters/scummvm/pull/20)
-  (`146c12a343`). Staged by name: `maze_rooms.{h,cpp}` and `maze_check.cpp`.
+  (`146c12a343`), merged on 2026-11-28 as `8f6cd09415`; the fork worktree is
+  removed, and `C:\dev\scummvm` was rebuilt from it. Staged by name:
+  `maze_rooms.{h,cpp}` and `maze_check.cpp`.
 - Docs: this packet, its pre-flight, the WP-097 note in scooby-exe, the pointer
   in WP-074, and the index row.
 - Local only: the decompile dumps, the table comparison, the self-test and live
