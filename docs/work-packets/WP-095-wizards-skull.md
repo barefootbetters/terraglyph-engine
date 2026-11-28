@@ -5,7 +5,7 @@ title: "WP-095: Phantom's wizard's skull, the demo and the attempt played"
 
 # WP-095: Phantom's wizard's skull: the demo and the attempt played (Gen 1)
 
-**Status:** 🟡 In progress (2026-11-28). Fork PR [barefootbetters/scummvm#19](https://github.com/barefootbetters/scummvm/pull/19) is open.
+**Status:** ✅ Done (2026-11-28). Fork PR [barefootbetters/scummvm#19](https://github.com/barefootbetters/scummvm/pull/19) is open.
 **Phase:** 5 (a gap found while searching packets for setup-only checks)
 **Depends on:** WP-077 ✅ (the room's class), WP-072 ✅ (the magic mirror room, the demo's way in and out), WP-081 ✅ (the bedroom a solve leads to)
 **Companion EC:** none (inline checklist under Exit criteria)
