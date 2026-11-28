@@ -5,7 +5,7 @@ title: "WP-097: Phantom's hedge maze, the original's ride"
 
 # WP-097: Phantom's hedge maze: the original's ride (Gen 1)
 
-**Status:** 🟡 In progress (2026-11-28). Fork PR [barefootbetters/scummvm#20](https://github.com/barefootbetters/scummvm/pull/20) is open.
+**Status:** ✅ Done (2026-11-28). Fork PR [barefootbetters/scummvm#20](https://github.com/barefootbetters/scummvm/pull/20) is open.
 **Phase:** 5 (a reconstruction found while searching packets for setup-only checks)
 **Depends on:** WP-074 ✅ (the maze's class and tables), WP-075 ✅ (the centre), WP-076 ✅ (below the balcony), WP-081 ✅ (the maze map item)
 **Companion EC:** none (inline checklist under Exit criteria)
